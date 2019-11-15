@@ -1,20 +1,30 @@
 {
-  "name": "vue-material-kit",
-  "author": "Creative Tim https://www.creative-tim.com/",
-  "description": "Vue Material Kit",
+  "name": "oktaform",
   "version": "1.2.0",
   "private": true,
+  "description": "Vue Material Kit",
+  "author": "AVB and Creative Tim(template)",
   "scripts": {
     "serve": "vue-cli-service serve --open",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "dev": "npm run serve",
-    "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm run dev"
+    "dev": "NODE_ENV=DEV vue-cli-service serve & sleep 5 && NODE_ENV=DEV electron app.js",
+    "dist": "build",
+    "electron:build": "vue-cli-service electron:build",
+    "electron:serve": "vue-cli-service electron:serve",
+    "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm run dev",
+    "pack": "build --dir",
+    "postinstall": "install-app-deps && electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps",
+    "start": "npm install && electron ./app"
   },
+  "main": "background.js",
   "dependencies": {
     "axios": "^0.19.0",
+    "electron": "^7.1.1",
     "epic-spinners": "^1.1.0",
     "jquery": "^3.4.1",
+    "js-file-download": "^0.4.8",
     "lodash.orderby": "^4.6.0",
     "nouislider": "14.0.2",
     "v-datatable-light": "^0.8.0",
@@ -36,8 +46,11 @@
     "@vue/cli-plugin-eslint": "3.9.2",
     "@vue/cli-service": "3.9.3",
     "@vue/eslint-config-prettier": "4.0.1",
+    "electron": "^6.0.0",
+    "electron-builder": "^22.1.0",
     "node-sass": "4.12.0",
     "sass-loader": "7.1.0",
+    "vue-cli-plugin-electron-builder": "^1.4.1",
     "vue-template-compiler": "2.6.10"
   }
 }

@@ -91,13 +91,13 @@
               <div class="md-layout-item md-size-50">
                 <md-field>
                   <label>Your Api Key</label>
-                  <md-input v-model="apiToken" type="email"></md-input>
+                  <md-input v-model="apiToken" type="password"></md-input>
                 </md-field>
               </div>
             </div>
             <md-field maxlength="5">
-              <label>Your Message</label>
-              <md-textarea v-model="message"></md-textarea>
+              <label>Name Your File</label>
+              <md-textarea v-model="filename"></md-textarea>
             </md-field>
             <div class="md-layout">
               <div class="md-layout-item md-size-33 mx-auto text-center">
@@ -166,7 +166,9 @@
 
 <script>
 import $ from "jquery";
+import Api from '@/services/api/Api'
 import {AtomSpinner} from 'epic-spinners'
+import FileDownload from 'js-file-download'
 import Loading from 'vue-loading-overlay';
 export default {
   bodyClass: "landing-page",
@@ -201,6 +203,7 @@ export default {
       message: null,
       selected: [],
       loading: "",
+      filename: "",
       renderComponent: true,
       tables: [],
       addedTables: [],
@@ -232,14 +235,20 @@ export default {
       var allItems = component.policies.concat(component.rules);
       console.log(allItems)
       console.log(resources)
-      component.$http.post(`https://vue-terraform.glitch.me/writeAll`, {
-        body: {resources: component.resources, items: allItems}
+      component.$http.post(`https://vue-terraform.herokuapp.com/writeAll`, {
+        body: {resources: component.resources, items: allItems, filename: component.filename}
       })
       .then(response => {
-        console.log(response)
+        console.log(response.data)
+        //let blob = new Blob([response.data], { type: 'application/tf' }),
+        FileDownload(response.data, this.filename + ".tf");
+        component.$http.delete('https://vue-terraform.herokuapp.com/file?filename=' + component.filename)
+        .then(response => {
+          console.log(this.result);
+        });
       })
       .catch(e => {
-        this.errors.push(e)
+        console.log(e)
       })
     },
     async sendApiResource(res) {
@@ -270,32 +279,32 @@ export default {
       if(key == "authorizationServers") {
         if(item["_links"]["claims"]) {
           var href = item["_links"]["claims"]["href"]
-          await component.$http.get("https://vue-terraform.glitch.me/policy" + "?href=" + href, {
+          await component.$http.get("https://vue-terraform.herokuapp.com/policy" + "?href=" + href, {
             params: {
-              url: "https://avb.oktapreview.com",
+              url: component.url,
             }
           }).then(function (response) {
             console.log(response)
             response.data.forEach(function(claim) {
               var claimModel = claim
-                claimModel["auth_server_id"] = item.id
-                claimModel["type"] = "claim"
+              claimModel["auth_server_id"] = item.id
+              claimModel["type"] = "claim"
               component.rules.push(claimModel)
             })
           })
         }
         if(item["_links"]["scopes"]) {
           var href = item["_links"]["scopes"]["href"]
-          await component.$http.get("https://vue-terraform.glitch.me/policy" + "?href=" + href, {
+          await component.$http.get("https://vue-terraform.herokuapp.com/policy" + "?href=" + href, {
             params: {
-              url: "https://avb.oktapreview.com",
+              url: component.url,
             }
           }).then(function (response) {
             console.log(response)
             response.data.forEach(function(scope) {
               var scopeModel = scope
-                scopeModel["auth_server_id"] = item.id
-                scopeModel["type"] = "scope"
+              scopeModel["auth_server_id"] = item.id
+              scopeModel["type"] = "scope"
               component.rules.push(scopeModel)
             })
           })
@@ -311,10 +320,9 @@ export default {
       if(item["_links"]["policies"] || item["_links"]["rules"]) {
         if(item["_links"]["policies"]) {
           var href = item["_links"]["policies"]["href"]
-          component.$http.get("https://vue-terraform.glitch.me/policy" + "?href=" + href, {
-            params: {
-              url: "https://avb.oktapreview.com",
-            }
+          component.$http.post("https://vue-terraform.herokuapp.com/policy", {
+            url: component.url,
+            apiToken: component.apiToken
           }).then(function (response) {
             console.log(response)
             var policies = response.data
@@ -328,9 +336,9 @@ export default {
           })
         } else if(item["_links"]["rules"]) {
           var href = item["_links"]["rules"]["href"]
-          component.$http.get("https://vue-terraform.glitch.me/policy" + "?href=" + href, {
+          component.$http.get("https://vue-terraform.herokuapp.com/policy" + "?href=" + href, {
             params: {
-              url: "https://avb.oktapreview.com",
+              url: component.url,
             }
           }).then(function (response) {
             console.log(response)
@@ -354,9 +362,9 @@ export default {
     },
     async getPolicies(type, policyResource, href) {
       var component = this
-      component.$http.get("https://vue-terraform.glitch.me/policy" + "?href=" + href, {
+      component.$http.get("https://vue-terraform.herokuapp.com/policy" + "?href=" + href, {
         params: {
-          url: "https://avb.oktapreview.com",
+          url: component.url,
         }
       }).then(function (response) {
         console.log(policyResource.id)
@@ -375,27 +383,24 @@ export default {
 
     },
     async getRules(type, ruleResource, href) {
-      component.$http.get("https://vue-terraform.glitch.me/policy" + "?href=" + href, {
-        params: {
-          url: "https://avb.oktapreview.com",
-        }
+      component.$http.post("https://vue-terraform.herokuapp.com/policy", {
+        url: component.url,
+        apiToken: component.apiToken
       }).then(function (response) {
 
       })
     },
     searchLogs() {
       var component = this
-      const baseURI = 'http://localhost:3000/timelogs' + "?search=" + this.searchParam
-      var resources = ["groups", "authorizationServers", "apps", "policies?type=OKTA_SIGN_ON", "policies?type=PASSWORD", "meta/schemas/user/default", "idps?type=SAML2", "idps?type=OIDC"]
+      const baseURI = ''
+      var resources = ["groups", "authorizationServers", "apps", "policies?type=OKTA_SIGN_ON", "idps?type=SAML2", "idps?type=OIDC"]
       resources.forEach(function(rez) {
+        //00cRT4g2MeNdErmn6i3EV_gjABw-v-kFzN4OlmN-0e
 
-
-        component.$http.get('https://teraform-generator.glitch.me/resource', {
-          params: {
-            url: "https://avb.oktapreview.com",
-            apiToken: "00cRT4g2MeNdErmn6i3EV_gjABw-v-kFzN4OlmN-0e",
+        component.$http.post('https://vue-terraform.herokuapp.com/resource', {
+            url: component.url,
+            apiToken: component.apiToken,
             resource: rez
-          }
         })
         .then(function (response) {
           console.log(response);
