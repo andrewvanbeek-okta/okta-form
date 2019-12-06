@@ -290,7 +290,9 @@ export default {
             console.log(response)
             response.data.forEach(function(claim) {
               var claimModel = claim
-              claimModel["auth_server_id"] = item.id
+              var name = item.name || item.profile.name
+              name = item.replace(/[^a-zA-Z ]/g, "")
+              claimModel["auth_server_id"] = name + item.id
               claimModel["type"] = "claim"
               component.rules.push(claimModel)
             })
@@ -306,7 +308,9 @@ export default {
             console.log(response)
             response.data.forEach(function(scope) {
               var scopeModel = scope
-              scopeModel["auth_server_id"] = item.id
+              var name = item.name || item.profile.name
+              name = item.replace(/[^a-zA-Z ]/g, "")
+              scopeModel["auth_server_id"] = name + item.id
               scopeModel["type"] = "scope"
               component.rules.push(scopeModel)
             })
