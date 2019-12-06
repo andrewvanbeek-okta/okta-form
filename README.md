@@ -24,7 +24,7 @@ Coming Soon
 
 
 ## Reporting Issues
-I use GitHub Issues as the official bug tracker for the Vue Material Kit. Here are some advices for our users that want to report an issue:
+I use GitHub Issues as the official bug tracker for the project. Here are some advices for our users that want to report an issue:
 
 ## Technical Support or Questions
 
