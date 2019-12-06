@@ -1,22 +1,22 @@
 
-
-
+const dotenv = require('dotenv');
+dotenv.config();
 
 // server.js
 // where your node app starts
-
+console.log(process.env.OKTA_API_TOKEN)
+var oktatoken = process.env.OKTA_API_TOKEN
+var oktaurl = process.env.OKTA_URL
 // init project
 const express = require("express");
 const app = express();
-
 var cors = require("cors");
 var hcltojson = require("hcl-to-json");
 var fs = require("fs");
-
-
 var bodyParser = require("body-parser");
 var tmp = require('tmp');
-
+var history = require('connect-history-api-fallback')
+app.use(history());
 process.on('SIGINT', function() {
   console.log( "\nGracefully shutting down from SIGINT (Ctrl-C)" );
   // some other closing procedures go heret
@@ -298,12 +298,9 @@ var filtered_object_keys = function(obj, filter) {
 
 var stringify = function(obj_from_json) {
   if (typeof obj_from_json !== "object" || Array.isArray(obj_from_json)) {
-    // not an object, stringify using native function
     var item = JSON.stringify(obj_from_json);
     if (item.includes) return JSON.stringify(obj_from_json);
   }
-  // Implements recursive object serialization according to JSON spec
-  // but without quotes around the keys.
   let props = Object.keys(obj_from_json)
   .map(key => `${key}:${stringify(obj_from_json[key])}`)
   .join(",");
@@ -364,18 +361,17 @@ app.get("/writePoliciesTwo", function(req, res) {
   var fullModel = new ModelCreator({ type: oktaJson.type, resource: oktaJson });
 
   var finalForm = fullModel.model.finalForm;
-
   fs.appendFile("yoyo.tf", finalForm, function(err) {
     if (err) throw err;
 
   });
-
   res.send({ type: "sources saved!" });
 });
 
 
 
 app.post("/writeAll", function(req, res) {
+  var autogenerate = true
   var filename = req.body.body.filename
   var itemsToWrite = [];
   var resources = req.body.body.resources;
@@ -400,13 +396,25 @@ app.post("/writeAll", function(req, res) {
     var finalForm = fullModel.model.finalForm;
     itemsToWrite.push(finalForm);
   });
-
   itemsToWrite.forEach(async function(item, index, array) {
     await fs.appendFile(filename + ".tf", item, function(err) {
       if (err) throw err;
       if (index === (array.length -1)) {
         // This is the last one.
-        res.download(filename + ".tf")
+        if(autogenerate) {
+          var util = require('util'),
+          exec = require('child_process').exec,
+          child,
+          child = exec("terraform apply -lock=false -auto-approve",
+          function (error, stdout, stderr) {
+            console.log('stdout: ' + stdout);
+            console.log('stderr: ' + stderr);
+            res.download("oktaform.tf")
+          });
+
+        } else {
+          res.download("oktaform.tf")
+        }
       }
     });
   });
@@ -414,8 +422,8 @@ app.post("/writeAll", function(req, res) {
 
 app.get("/policy", function(req, res) {
   var request = require("request");
-  var href = req.query.href;
-  var token = req.query.apiToken
+  var href = req.query.href || process.env.OKTA_URL
+  var token = req.query.apiToken || process.env.OKTA_API_TOKEN
   var options = {
     method: "GET",
     url: href,
@@ -453,10 +461,12 @@ app.post("/policy", function(req, res) {
 
 app.get("/resource", function(req, res) {
   console.log("YEAH")
+  console.log(oktatoken)
+  console.log(process.env.OKTA_API_TOKEN)
   var request = require("request");
   var object = req.query.resource;
-  var url = req.query.url;
-  var token = req.query.apiToken;
+  var url = req.query.url || process.env.OKTA_URL
+  var token = req.query.apiToken || process.env.OKTA_API_TOKEN;
   var options = {
     method: "GET",
     url: req.query.url + "/api/v1/" + object,
@@ -476,14 +486,17 @@ app.get("/resource", function(req, res) {
 
 app.post("/resource", function(req, res) {
   var request = require("request");
-  var object = req.body.resource;
-  var url = req.body.url;
-  var token = req.body.apiToken;
+  var object = req.body.resource
+  var url = oktaurl || req.body.url
+  console.log("SPAGHETTTTTIIII BOOOLONNESSSSSSEEEE")
+  console.log(url)
+  var token = oktatoken || req.body.apiToken
+  console.log(oktatoken)
+  console.log("SPAGHETTTTTIIII BOOOLONNESSSSSSEEEE")
   var options = {
     method: "GET",
-    url: req.body.url + "/api/v1/" + object,
+    url: url + "/api/v1/" + object,
     headers: {
-      "Postman-Token": "c0835a0c-584e-1360-8ff3-5039f827eab4",
       "Cache-Control": "no-cache",
       Authorization: "SSWS " + token,
       "Content-Type": "application/json",
@@ -495,8 +508,6 @@ app.post("/resource", function(req, res) {
     var oauthApplications = []
     console.log
     if(req.body.resource == "apps") {
-      console.log("DJNSUIGYUFDGSHFOPIHGHIJPHHVIJPHBKIJPHBKIJHBJKHIJHJBKHBLILNBHIBJKHBJKIKBUHIOU")
-      console.log(body)
       var arrayBody = JSON.parse(body)
       arrayBody.forEach(function(app){
         if(app.settings.oauthClient) {

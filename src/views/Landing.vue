@@ -101,40 +101,44 @@
             </md-field>
             <div class="md-layout">
               <div class="md-layout-item md-size-33 mx-auto text-center">
-                <md-button v-on:click="searchLogs()" class="md-success">Get Okta Config</md-button>
+                <md-button v-on:click="pullResources()" class="md-success">Get Okta Config</md-button>
               </div>
             </div>
           </form>
           <center>
 
           </center>
-          <div v-for="(table, i) in tables" v-if="renderComponent" style="align-items: flex-start;" class="full-table">
+          <vue-tabs>
+            <v-tab v-for="(table, i) in tables" v-if="renderComponent" :title="tables[i].title">
+              <div style="align-items: flex-start;" class="full-table">
 
-            <h1>{{tables[i].title}}</h1>
-            <md-table v-model="tables[i].respData" md-card @md-selected="onSelect">
-              <md-table-toolbar>
-                <h1 class="md-title">With auto select and alternate headers</h1>
-              </md-table-toolbar>
+                <h1>{{tables[i].title}}</h1>
+                <md-table v-model="tables[i].respData" md-card @md-selected="onSelect">
+                  <md-table-toolbar>
+                    <h1 class="md-title">With auto select and alternate headers</h1>
+                  </md-table-toolbar>
+                  <md-table-toolbar slot="md-table-alternate-header" slot-scope="{ count }">
+                    <div class="md-toolbar-section-start">{{ getAlternateLabel(count) }}</div>
+                    <div class="md-toolbar-section-end">
+                      <md-button class="md-icon-button">
+                        <md-icon>delete</md-icon>
+                      </md-button>
+                    </div>
+                  </md-table-toolbar>
+                  <md-table-row slot-scope="{ item }" slot="md-table-row" md-seleted="true" md-selectable="multiple" md-auto-select>
+                    <md-table-cell v-for="key in Object.keys(item)" :md-label="key" md-sort-by="name"> {{ item[key] }} </md-table-cell>
+                  </md-table-row>
+                </md-table>
+                <md-button v-on:click="sendApiResource(tables[i].title)" class="md-success">Add/Remove {{ tables[i].title }}</md-button>
+              </div>
+            </v-tab>
+          </vue-tabs>
 
-              <md-table-toolbar slot="md-table-alternate-header" slot-scope="{ count }">
-                <div class="md-toolbar-section-start">{{ getAlternateLabel(count) }}</div>
-
-                <div class="md-toolbar-section-end">
-                  <md-button class="md-icon-button">
-                    <md-icon>delete</md-icon>
-                  </md-button>
-                </div>
-              </md-table-toolbar>
-              <md-table-row slot-scope="{ item }" slot="md-table-row" md-selectable="multiple" md-auto-select>
-                <md-table-cell v-for="key in Object.keys(item)" :md-label="key" md-sort-by="name"> {{ item[key] }} </md-table-cell>
-              </md-table-row>
-            </md-table>
-            <md-button v-on:click="sendApiResource(tables[i].title)" class="md-success">Add/Remove {{ tables[i].title }}</md-button>
-          </div>
         </div>
       </div>
     </div>
   </div>
+  <md-switch v-model="autogenerate">Auto Migrate is on</md-switch>
   <md-button v-on:click="sendSelected()" class="md-success">Generate</md-button>
   <md-button v-on:click="show()" class="md-success">show</md-button>
   <modal name="hello-world" :adaptive="true" :scrollable="true" width="80%" height="auto">
@@ -144,10 +148,8 @@
         <md-table-toolbar>
           <h1 class="md-title">With auto select and alternate headers</h1>
         </md-table-toolbar>
-
         <md-table-toolbar slot="md-table-alternate-header" slot-scope="{ count }">
           <div class="md-toolbar-section-start">{{ getAlternateLabel(count) }}</div>
-
           <div class="md-toolbar-section-end">
             <md-button class="md-icon-button">
               <md-icon>delete</md-icon>
@@ -165,6 +167,10 @@
 </template>
 
 <script>
+
+import {VueTabs, VTab} from 'vue-nav-tabs'
+import 'vue-nav-tabs/themes/vue-tabs.css'
+
 import $ from "jquery";
 import Api from '@/services/api/Api'
 import {AtomSpinner} from 'epic-spinners'
@@ -191,13 +197,16 @@ export default {
     }
   },
   components: {
-    AtomSpinner
+    AtomSpinner,
+    VueTabs,
+    VTab
   },
   data() {
     return {
       url: null,
       resources: {},
       policies: [],
+      autogenerate: true,
       rules: [],
       apiToken: null,
       message: null,
@@ -227,22 +236,17 @@ export default {
       this.$modal.hide('hello-world');
     },
     sendSelected() {
-      // $("#cover").fadeIn(100);
       var component = this
       var resources = component.selected
-      console.log(this.policies)
-      console.log(this.rules)
       var allItems = component.policies.concat(component.rules);
-      console.log(allItems)
-      console.log(resources)
-      component.$http.post(`https://vue-terraform.herokuapp.com/writeAll`, {
+      component.$http.post(`http://localhost:8000/writeAll`, {
         body: {resources: component.resources, items: allItems, filename: component.filename}
       })
       .then(response => {
         console.log(response.data)
         //let blob = new Blob([response.data], { type: 'application/tf' }),
         FileDownload(response.data, this.filename + ".tf");
-        component.$http.delete('https://vue-terraform.herokuapp.com/file?filename=' + component.filename)
+        component.$http.delete('http://localhost:8000/file?filename=' + component.filename)
         .then(response => {
           console.log(this.result);
         });
@@ -253,14 +257,13 @@ export default {
     },
     async sendApiResource(res) {
       var component = this
-      console.log("YEHBEFSIGIU")
-      console.log(res)
-      console.log(component.rules)
+      console.log(this.selected)
       this.resources[res] = this.selected
+      console.log(this.resources[res])
+      debugger
       if(this.selected.length == 0) {
         delete this.resources[res]
       }
-      console.log(this.resources)
       if(this.resources[res]) {
         this.resources[res].forEach(function(item, key, arr) {
           component.checkPoliciesAndRules(item)
@@ -279,7 +282,7 @@ export default {
       if(key == "authorizationServers") {
         if(item["_links"]["claims"]) {
           var href = item["_links"]["claims"]["href"]
-          await component.$http.get("https://vue-terraform.herokuapp.com/policy" + "?href=" + href, {
+          await component.$http.get("http://localhost:8000/policy" + "?href=" + href, {
             params: {
               url: component.url,
             }
@@ -295,7 +298,7 @@ export default {
         }
         if(item["_links"]["scopes"]) {
           var href = item["_links"]["scopes"]["href"]
-          await component.$http.get("https://vue-terraform.herokuapp.com/policy" + "?href=" + href, {
+          await component.$http.get("http://localhost:8000/policy" + "?href=" + href, {
             params: {
               url: component.url,
             }
@@ -313,14 +316,10 @@ export default {
     },
     async checkPoliciesAndRules(item) {
       var component = this
-      console.log("OOOOOOOOOOOOOOOOOOOOOOO")
-      console.log(item["_links"])
-      console.log(item["_links"])
-      console.log("OOOOOOOOOOOOOOOOOOOOOOO")
       if(item["_links"]["policies"] || item["_links"]["rules"]) {
         if(item["_links"]["policies"]) {
           var href = item["_links"]["policies"]["href"]
-          component.$http.post("https://vue-terraform.herokuapp.com/policy", {
+          component.$http.post("http://localhost:8000/policy", {
             url: component.url,
             apiToken: component.apiToken
           }).then(function (response) {
@@ -336,7 +335,7 @@ export default {
           })
         } else if(item["_links"]["rules"]) {
           var href = item["_links"]["rules"]["href"]
-          component.$http.get("https://vue-terraform.herokuapp.com/policy" + "?href=" + href, {
+          component.$http.get("http://localhost:8000/policy" + "?href=" + href, {
             params: {
               url: component.url,
             }
@@ -362,13 +361,11 @@ export default {
     },
     async getPolicies(type, policyResource, href) {
       var component = this
-      component.$http.get("https://vue-terraform.herokuapp.com/policy" + "?href=" + href, {
+      component.$http.get("http://localhost:8000/policy" + "?href=" + href, {
         params: {
           url: component.url,
         }
       }).then(function (response) {
-        console.log(policyResource.id)
-        console.log(response)
         var policies = response.data
         var policyArray = []
         response.data.forEach(function(policy) {
@@ -383,24 +380,22 @@ export default {
 
     },
     async getRules(type, ruleResource, href) {
-      component.$http.post("https://vue-terraform.herokuapp.com/policy", {
+      component.$http.post("http://localhost:8000/policy", {
         url: component.url,
         apiToken: component.apiToken
       }).then(function (response) {
 
       })
     },
-    searchLogs() {
+    pullResources() {
       var component = this
       const baseURI = ''
       var resources = ["groups", "authorizationServers", "apps", "policies?type=OKTA_SIGN_ON", "idps?type=SAML2", "idps?type=OIDC"]
       resources.forEach(function(rez) {
-        //00cRT4g2MeNdErmn6i3EV_gjABw-v-kFzN4OlmN-0e
-
-        component.$http.post('https://vue-terraform.herokuapp.com/resource', {
-            url: component.url,
-            apiToken: component.apiToken,
-            resource: rez
+        component.$http.post('http://localhost:8000/resource', {
+          url: component.url,
+          apiToken: component.apiToken,
+          resource: rez
         })
         .then(function (response) {
           console.log(response);
@@ -421,9 +416,9 @@ export default {
 
 
     },
-    onSelect (items) {
-      this.selected = items
-      console.log(this.selected)
+    onSelect(items) {
+      var component = this
+      component.selected = items
     },
     getAlternateLabel (count) {
       let plural = ''

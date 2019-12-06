@@ -17,19 +17,15 @@ import App from "./App.vue";
 import router from "./router";
 import axios from 'axios'
 import VModal from 'vue-js-modal'
-
 import MaterialKit from "./plugins/material-kit";
 
 Vue.config.productionTip = false;
 Vue.prototype.$http = axios
-
 Vue.use(MaterialKit);
 Vue.use(VModal)
-
 const NavbarStore = {
   showNavbar: false
 };
-
 Vue.mixin({
   data() {
     return {
