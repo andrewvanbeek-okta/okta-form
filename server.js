@@ -37,11 +37,15 @@ class Group {
 }
 
 var tfGenerate = function(model, fullObject, resource, keys) {
+  var name = fullObject.name || fullObject.profile.name
+  name = name.replace(/[^a-zA-Z ]/g, "")
+  console.log(name)
+  console.log(fullObject)
   var header =
   "resource " +
   JSON.stringify(resource) +
   " " +
-  JSON.stringify(fullObject.id);
+  JSON.stringify(name.replace(/\s+/g, '') + fullObject.id);
   var body = header + " {\n";
   keys.forEach(function(key) {
     var keyvalue = "";
