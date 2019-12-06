@@ -157,7 +157,7 @@ class SignOnPolicy {
   constructor(policy) {
     this.status = policy.status;
     this.name = policy.name;
-    this.description = policy.description;
+    this.description = policy.description || "static description"
     this.finalForm = tfGenerate(
       this,
       policy,

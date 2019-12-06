@@ -332,6 +332,8 @@ export default {
             var policyArray = []
             response.data.forEach(function(policy) {
               var policyModel = policy
+              var name = item.name || item.profile.name
+              name = item.replace(/[^a-zA-Z ]/g, "")
               policyModel["resourceName"] = item.id
               component.policies.push(policyModel)
               component.checkPoliciesAndRules(policyModel)
@@ -349,7 +351,9 @@ export default {
             var policyArray = []
             response.data.forEach(function(rule) {
               var ruleModel = rule
-              ruleModel["resourceName"] = item.id
+              var name = item.name || item.profile.name
+              name = item.replace(/[^a-zA-Z ]/g, "")
+              ruleModel["resourceName"] = name + item.id
               if(rule.type == "RESOURCE_ACCESS") {
                 ruleModel["auth_server_id"] = item["resourceName"]
               }
