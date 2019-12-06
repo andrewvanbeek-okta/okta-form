@@ -6,8 +6,18 @@ Url Coming Soon
 
 ## Quick start
 
-This app uses Vue so Vue, Node, npm are a must as well as having terraform.  Just clone this project. do npm install and then open up two terminal windows, one where you run the Vue App with npm run serve, and the other whe you run node server.js. If you want this application to apply and migrate the configuration for you run terraform init in the command line and edit the init.tf file with the info of the Okta Org you want to migrate to.  Additionally if you do not want to type out your api key and url  
+This app uses Vue so Vue, Node, npm are a must as well as having terraform.  Just clone this project. do npm install and then open up two terminal windows, one where you run the Vue App with npm run serve, and the other whe you run node server.js. If you want this application to apply and migrate the configuration for you run terraform init in the command line and edit the init.tf file with the info of the Okta Org you want to migrate to.  Additionally if you do not want to type out your api key and url feel free to leverage .env file with OKTA_URL= and OKTA_API_TOKEN=.
 
+Commands as mentioned above ^
+git clone
+npm install
+terraform init(optional)
+npm run serve(in terminal window one)
+node server.js(in terminal window two)
+
+## Credit
+
+Credit for the UI to http://creative-tim.com/, really top-notch stuff.  Also Credit to Andy G from Articulate for his work on terraform and Okta.
 
 ## Documentation
 Coming Soon
