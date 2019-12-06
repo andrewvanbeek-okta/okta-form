@@ -398,14 +398,10 @@ export default {
           resource: rez
         })
         .then(function (response) {
-          console.log(response);
-          console.log(component)
           component.tables.push({title: rez, respData: response.data})
           component.rezources = response.data
-          console.log(response.data)
           component.renderComponent = false;
           component.$nextTick(() => {
-            console.log("JFSEHFIESUHUI")
             component.renderComponent = true;
           });
         })

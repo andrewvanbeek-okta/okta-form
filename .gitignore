@@ -2,11 +2,13 @@
 node_modules/
 package-lock.json
 /dist
+init.tf
 
 # local env files
 .env
 .env.local
 .env.*.local
+
 
 # Log files
 npm-debug.log*

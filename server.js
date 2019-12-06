@@ -4,7 +4,6 @@ dotenv.config();
 
 // server.js
 // where your node app starts
-console.log(process.env.OKTA_API_TOKEN)
 var oktatoken = process.env.OKTA_API_TOKEN
 var oktaurl = process.env.OKTA_URL
 // init project
@@ -19,15 +18,12 @@ var history = require('connect-history-api-fallback')
 app.use(history());
 process.on('SIGINT', function() {
   console.log( "\nGracefully shutting down from SIGINT (Ctrl-C)" );
-  // some other closing procedures go heret
   process.exit(1);
 });
 
-// parse application/json
+
 app.use(bodyParser.json());
 
-// we've started you off with Express,
-// but feel free to use whatever libs or frameworks you'd like through `package.json`.
 class Group {
   constructor(group) {
     this.name = group.profile.name;
@@ -432,7 +428,6 @@ app.get("/policy", function(req, res) {
     method: "GET",
     url: href,
     headers: {
-      "Postman-Token": "c0835a0c-584e-1360-8ff3-5039f827eab4",
       "Cache-Control": "no-cache",
       Authorization: "SSWS " + token,
       "Content-Type": "application/json",
@@ -464,9 +459,6 @@ app.post("/policy", function(req, res) {
 });
 
 app.get("/resource", function(req, res) {
-  console.log("YEAH")
-  console.log(oktatoken)
-  console.log(process.env.OKTA_API_TOKEN)
   var request = require("request");
   var object = req.query.resource;
   var url = req.query.url || process.env.OKTA_URL
@@ -475,7 +467,6 @@ app.get("/resource", function(req, res) {
     method: "GET",
     url: req.query.url + "/api/v1/" + object,
     headers: {
-      "Postman-Token": "c0835a0c-584e-1360-8ff3-5039f827eab4",
       "Cache-Control": "no-cache",
       Authorization: "SSWS " + token,
       "Content-Type": "application/json",
@@ -492,11 +483,7 @@ app.post("/resource", function(req, res) {
   var request = require("request");
   var object = req.body.resource
   var url = oktaurl || req.body.url
-  console.log("SPAGHETTTTTIIII BOOOLONNESSSSSSEEEE")
-  console.log(url)
   var token = oktatoken || req.body.apiToken
-  console.log(oktatoken)
-  console.log("SPAGHETTTTTIIII BOOOLONNESSSSSSEEEE")
   var options = {
     method: "GET",
     url: url + "/api/v1/" + object,
