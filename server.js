@@ -514,14 +514,14 @@ app.post("/resource", function(req, res) {
 });
 
 app.delete("/file", function(req, res){
-  var filename = req.query.filename
-  fs.unlink(filename + ".tf", (error) => {
-    if (!error) {
-      console.log("deleted")
-    } else {
-      console.log(error)
-    }
-  })
+  // var filename = req.query.filename
+  // fs.unlink(filename + ".tf", (error) => {
+  //   if (!error) {
+  //     console.log("deleted")
+  //   } else {
+  //     console.log(error)
+  //   }
+  // })
 })
 
 app.get("/apply", function(req, res){
