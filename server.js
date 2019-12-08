@@ -422,7 +422,8 @@ app.post("/writeAll", function(req, res) {
 
 app.get("/policy", function(req, res) {
   var request = require("request");
-  var href = req.query.href || process.env.OKTA_URL
+  console.log("GETS HERE")
+  var href = req.query.href
   var token = req.query.apiToken || process.env.OKTA_API_TOKEN
   var options = {
     method: "GET",
@@ -435,6 +436,7 @@ app.get("/policy", function(req, res) {
     }
   };
   request(options, function(error, response, body) {
+    console.log(body)
     res.send(body);
   });
 });

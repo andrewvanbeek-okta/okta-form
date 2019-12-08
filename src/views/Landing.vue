@@ -291,7 +291,7 @@ export default {
             response.data.forEach(function(claim) {
               var claimModel = claim
               var name = item.name || item.profile.name
-              name = item.replace(/[^a-zA-Z ]/g, "")
+              name = name.replace(/[^a-zA-Z ]/g, "")
               claimModel["auth_server_id"] = name + item.id
               claimModel["type"] = "claim"
               component.rules.push(claimModel)
@@ -323,7 +323,7 @@ export default {
       if(item["_links"]["policies"] || item["_links"]["rules"]) {
         if(item["_links"]["policies"]) {
           var href = item["_links"]["policies"]["href"]
-          component.$http.post("http://localhost:8000/policy", {
+          component.$http.get("http://localhost:8000/policy", {
             url: component.url,
             apiToken: component.apiToken
           }).then(function (response) {
@@ -346,17 +346,19 @@ export default {
               url: component.url,
             }
           }).then(function (response) {
+            window.alert("NFSBUFIH")
             console.log(response)
             var policies = response.data
             var policyArray = []
             response.data.forEach(function(rule) {
               var ruleModel = rule
               var name = item.name || item.profile.name
-              name = item.replace(/[^a-zA-Z ]/g, "")
+              name = name.replace(/[^a-zA-Z ]/g, "")
               ruleModel["resourceName"] = name + item.id
               if(rule.type == "RESOURCE_ACCESS") {
                 ruleModel["auth_server_id"] = item["resourceName"]
               }
+              debugger
               component.rules.push(ruleModel)
               component.checkPoliciesAndRules(ruleModel)
             })
