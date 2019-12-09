@@ -305,6 +305,7 @@ export default {
         //let blob = new Blob([response.data], { type: 'application/tf' }),
         component.spinning(false)
         component.showResponse(response.data)
+        FileDownload(response.data, component.filename + ".tf")
       })
       .catch(e => {
         console.log(e)
@@ -327,7 +328,6 @@ export default {
     },
     async sendApiResource(res) {
       var component = this
-      console.log(this.selected)
       this.resources[res] = this.selected
       console.log(this.resources[res])
       if(this.selected.length == 0) {
