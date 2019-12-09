@@ -526,6 +526,24 @@ app.delete("/file", function(req, res){
   // })
 })
 
+app.get("/files", function(req, res){
+  var glob = require("glob")
+  glob(__dirname + '/**/*.tf', {}, (err, files)=>{
+    var filestosend = []
+    files.forEach(function(file) {
+      var value = __dirname + "/"
+      var filename = file.split(value)[1]
+      console.log(filename)
+      if(filename != "init.tf") {
+        var timestamp = fs.statSync(file).mtime.getTime()
+        const date = new Date(timestamp);
+        filestosend.push({"name" : filename, "timestamp": date})
+      }
+    })
+    console.log(filestosend)
+    res.send({"files": filestosend})
+  })
+})
 app.get("/apply", function(req, res){
   var util = require('util'),
   exec = require('child_process').exec,

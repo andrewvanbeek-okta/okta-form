@@ -141,6 +141,7 @@
   <md-switch v-model="autogenerate">Auto Migrate is on</md-switch>
   <md-button v-on:click="sendSelected()" class="md-success">Generate</md-button>
   <md-button v-on:click="show()" class="md-success">show</md-button>
+  <md-button v-on:click="showDelete()" class="md-success">delete</md-button>
   <modal name="hello-world" :adaptive="true" :scrollable="true" width="80%" height="auto">
     <div v-for="(table, i) in addedTables" v-if="renderComponent" class="full-table">
       <h1>{{addedTables[i].title}}</h1>
@@ -158,6 +159,31 @@
         </md-table-toolbar>
         <md-table-row slot-scope="{ item }" slot="md-table-row">
           <md-table-cell v-for="key in Object.keys(item)" :md-label="key" md-sort-by="name"> {{ item[key] }} </md-table-cell>
+        </md-table-row>
+      </md-table>
+    </div>
+  </modal>
+  <modal name="delete" :adaptive="true" :scrollable="true" width="80%" height="auto">
+    <div v-if="renderComponent" class="full-table">
+      <h1>Delete Models and Files</h1>
+      <md-table v-model="files" md-sort="timestamp" md-sort-order="asc" md-card>
+        <md-table-toolbar>
+          <h1 class="md-title">With auto select and alternate headers</h1>
+        </md-table-toolbar>
+        <md-table-toolbar slot="md-table-alternate-header" slot-scope="{ count }">
+          <div class="md-toolbar-section-start">{{ getAlternateLabel(count) }}</div>
+          <div class="md-toolbar-section-end">
+            <md-button class="md-icon-button">
+              <md-icon>delete</md-icon>
+            </md-button>
+          </div>
+        </md-table-toolbar>
+        <md-table-row slot-scope="{ item }" slot="md-table-row">
+          <md-table-cell md-label="Name">{{ item.name }}</md-table-cell>
+          <md-table-cell md-label="Last Modified" md-sort-by="name">{{ item.timestamp }}</md-table-cell>
+          <md-table-cell md-label="delete file and models associated" md-sort-by="name"><md-button class="md-icon-button">
+            <md-icon>delete</md-icon>
+          </md-button></md-table-cell>
         </md-table-row>
       </md-table>
     </div>
@@ -217,6 +243,7 @@ export default {
       tables: [],
       addedTables: [],
       render: false,
+      files: [{"name": "test"}],
       rezources: []
     };
   },
@@ -231,6 +258,13 @@ export default {
       }
       console.log("YEAH")
       this.$modal.show('hello-world');
+    },
+    async showDelete() {
+      var component = this
+      var files = await component.$http.get(`http://localhost:8000/files`)
+      console.log(files)
+      component.files = files.data.files
+      this.$modal.show('delete');
     },
     hide() {
       this.$modal.hide('hello-world');
