@@ -566,9 +566,9 @@ app.get("/apply", function(req, res){
   child = exec("terraform apply -lock=false -auto-approve",
   function (error, stdout, stderr) {
     console.log('stdout: ' + stdout);
+    res.send({"message": stdout})
     console.log('stderr: ' + stderr);
   });
-  res.send({"message": "oh yeah"})
 })
 
 // listen for requests :

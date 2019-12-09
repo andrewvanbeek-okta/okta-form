@@ -4,7 +4,7 @@
       <center>
         <atom-spinner class ="loader"
         :animation-duration="1000"
-        :size="200"
+        :size="600"
         :color="'#ff1d5e'"
         />
       </center>
@@ -188,12 +188,26 @@
       </md-table>
     </div>
   </modal>
+  <modal name="response" :adaptive="true" :scrollable="true" width="80%" height="auto">
+    <div v-model="serverResponse">{{serverResponse}}</div>
+  </modal>
+  <modal name="spinner" :adaptive="true" :scrollable="true" width="50%" height="auto">
+    <center>
+        <h3>Hold tight</h3>
+      <atom-spinner
+       :animation-duration="1000"
+       :size="60"
+       :color="'#ff1d5e'"
+  />
+    </center>
+  </modal>
+
 </div>
 </div>
 </template>
 
 <script>
-
+import Spinner from 'vue-spinner-component/src/Spinner.vue';
 import {VueTabs, VTab} from 'vue-nav-tabs'
 import 'vue-nav-tabs/themes/vue-tabs.css'
 
@@ -225,6 +239,7 @@ export default {
   components: {
     AtomSpinner,
     VueTabs,
+    Spinner,
     VTab
   },
   data() {
@@ -234,6 +249,7 @@ export default {
       policies: [],
       autogenerate: true,
       rules: [],
+      serverResponse: "",
       apiToken: null,
       message: null,
       selected: [],
@@ -248,6 +264,13 @@ export default {
     };
   },
   methods: {
+    spinning(value) {
+      if(value){
+        this.$modal.show('spinner');
+      } else {
+        this.$modal.hide('spinner');
+      }
+    },
     show() {
       var component = this
       this.addedTables = []
@@ -271,6 +294,7 @@ export default {
     },
     sendSelected() {
       var component = this
+      component.spinning(true)
       var resources = component.selected
       var allItems = component.policies.concat(component.rules);
       component.$http.post(`http://localhost:8000/writeAll`, {
@@ -279,11 +303,8 @@ export default {
       .then(response => {
         console.log(response.data)
         //let blob = new Blob([response.data], { type: 'application/tf' }),
-        FileDownload(response.data, this.filename + ".tf");
-        component.$http.delete('http://localhost:8000/file?filename=' + component.filename)
-        .then(response => {
-          console.log(this.result);
-        });
+        component.spinning(false)
+        component.showResponse(response.data)
       })
       .catch(e => {
         console.log(e)
@@ -291,21 +312,24 @@ export default {
     },
     async deleteFileAndApply(file) {
       var component = this
-      console.log(file)
+      component.spinning(true)
       component.$http.delete('http://localhost:8000/removeFile?filename=' + file)
       .then(response => {
-        console.log(this.result);
         component.$http.get("http://localhost:8000/apply").then(response => {
-          console.log(response)
+          component.showResponse(response.data.message)
+          component.spinning(false)
         })
       })
+    },
+    showResponse(response){
+      this.serverResponse = response
+      this.$modal.show('response');
     },
     async sendApiResource(res) {
       var component = this
       console.log(this.selected)
       this.resources[res] = this.selected
       console.log(this.resources[res])
-      debugger
       if(this.selected.length == 0) {
         delete this.resources[res]
       }
@@ -403,7 +427,6 @@ export default {
               if(rule.type == "RESOURCE_ACCESS") {
                 ruleModel["auth_server_id"] = item["resourceName"]
               }
-              debugger
               component.rules.push(ruleModel)
               component.checkPoliciesAndRules(ruleModel)
             })
@@ -538,6 +561,20 @@ export default {
   position: sticky;
   top: 4rem;
 }
+
+.v--modal-overlay[data-modal="spinner"] {
+  background: white;
+}
+
+
+.v--modal-overlay[data-modal="spinner"] .v--modal-box {
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+    background: transparent;
+}
+
+
 
 
 </style>
