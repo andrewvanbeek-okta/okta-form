@@ -372,6 +372,7 @@ app.get("/writePoliciesTwo", function(req, res) {
 
 app.post("/writeAll", function(req, res) {
   var autogenerate = true
+  console.log(req.body.body)
   var filename = req.body.body.filename
   var itemsToWrite = [];
   var resources = req.body.body.resources;
@@ -526,6 +527,18 @@ app.delete("/file", function(req, res){
   // })
 })
 
+app.delete("/removeFile", function(req, res){
+  var filename = req.query.filename
+  fs.unlink(filename, (error) => {
+    if (!error) {
+      res.send({"message": "deleted"})
+      console.log("deleted")
+    } else {
+      console.log(error)
+    }
+  })
+})
+
 app.get("/files", function(req, res){
   var glob = require("glob")
   glob(__dirname + '/**/*.tf', {}, (err, files)=>{
@@ -537,14 +550,16 @@ app.get("/files", function(req, res){
       if(filename != "init.tf") {
         var timestamp = fs.statSync(file).mtime.getTime()
         const date = new Date(timestamp);
-        filestosend.push({"name" : filename, "timestamp": date})
+        filestosend.push({"name" : filename, "timestamp": date, fullfilepath: file})
       }
     })
     console.log(filestosend)
     res.send({"files": filestosend})
   })
 })
+
 app.get("/apply", function(req, res){
+  console.log("gets to apply")
   var util = require('util'),
   exec = require('child_process').exec,
   child,

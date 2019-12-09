@@ -97,7 +97,7 @@
             </div>
             <md-field maxlength="5">
               <label>Name Your File</label>
-              <md-textarea v-model="filename"></md-textarea>
+              <md-input v-model="filename"></md-input>
             </md-field>
             <div class="md-layout">
               <div class="md-layout-item md-size-33 mx-auto text-center">
@@ -181,7 +181,7 @@
         <md-table-row slot-scope="{ item }" slot="md-table-row">
           <md-table-cell md-label="Name">{{ item.name }}</md-table-cell>
           <md-table-cell md-label="Last Modified" md-sort-by="name">{{ item.timestamp }}</md-table-cell>
-          <md-table-cell md-label="delete file and models associated" md-sort-by="name"><md-button class="md-icon-button">
+          <md-table-cell md-label="delete file and models associated" md-sort-by="name"><md-button v-on:click="deleteFileAndApply(item.fullfilepath)" class="md-icon-button">
             <md-icon>delete</md-icon>
           </md-button></md-table-cell>
         </md-table-row>
@@ -238,7 +238,7 @@ export default {
       message: null,
       selected: [],
       loading: "",
-      filename: "",
+      filename: "oktaform",
       renderComponent: true,
       tables: [],
       addedTables: [],
@@ -287,6 +287,17 @@ export default {
       })
       .catch(e => {
         console.log(e)
+      })
+    },
+    async deleteFileAndApply(file) {
+      var component = this
+      console.log(file)
+      component.$http.delete('http://localhost:8000/removeFile?filename=' + file)
+      .then(response => {
+        console.log(this.result);
+        component.$http.get("http://localhost:8000/apply").then(response => {
+          console.log(response)
+        })
       })
     },
     async sendApiResource(res) {
