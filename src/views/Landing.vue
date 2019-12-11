@@ -403,7 +403,8 @@ export default {
               var policyModel = policy
               var name = item.name || item.profile.name
               name = item.replace(/[^a-zA-Z ]/g, "")
-              policyModel["resourceName"] = item.id
+              name = name.replace(/\s+/g, '')
+              policyModel["resourceName"] = name + item.id
               component.policies.push(policyModel)
               component.checkPoliciesAndRules(policyModel)
             })
@@ -423,6 +424,7 @@ export default {
               var ruleModel = rule
               var name = item.name || item.profile.name
               name = name.replace(/[^a-zA-Z ]/g, "")
+              name = name.replace(/\s+/g, '')
               ruleModel["resourceName"] = name + item.id
               if(rule.type == "RESOURCE_ACCESS") {
                 ruleModel["auth_server_id"] = item["resourceName"]

@@ -77,8 +77,8 @@ class OidcIdp {
     this.authorization_binding = idp.protocol.endpoints.authorization.binding;
     this.token_url = idp.protocol.endpoints.token.url;
     this.token_binding = idp.protocol.endpoints.token.binding;
-    this.user_info_url = "";
-    this.user_info_binding = "";
+    this.user_info_url = idp.protocol.endpoints.token.url || "https://placeholderfromokta.com"
+    this.user_info_binding = "HTTP-REDIRECT"
     this.jwks_url = idp.protocol.endpoints.jwks.url;
     this.jwks_binding = idp.protocol.endpoints.jwks.binding;
     this.scopes = ["openid"];
@@ -172,6 +172,7 @@ class SignOnRule {
     this.status = rule.status;
     this.name = rule.name;
     this.policyid = "${okta_policy_signon." + rule.resourceName + ".id}";
+    this.access = rule.actions.access
     this.finalForm = tfGenerate(
       this,
       rule,
