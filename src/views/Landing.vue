@@ -18,7 +18,7 @@
             >
             <br />
             <md-button
-            href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            href="https://www.youtube.com/channel/UC5AMiWqFVFxF1q9Ya1FuZ_Q"
             class="md-success md-lg"
             target="_blank"
             ><i class="fas fa-play"></i> Watch video</md-button
