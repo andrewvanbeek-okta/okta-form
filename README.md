@@ -15,6 +15,8 @@ Commands as mentioned above ^
 ```
 $ git clone git@github.com:andrewvanbeek-okta/okta-form.git
 
+$ cd okta-form
+
 $ npm install
 
 # Optional
