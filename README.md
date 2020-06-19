@@ -20,11 +20,7 @@ $ npm install
 # Optional
 $ terraform init
 
-# In terminal window one
-$ npm run serve
-
-# In terminal window two
-$ node server.js
+$ npm start
 ```
 
 ## Credit
