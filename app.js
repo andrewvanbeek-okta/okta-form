@@ -355,7 +355,7 @@ express_application.get("/writePolicies", function(req, res) {
       resource: oktaJson
     });
     var finalForm = fullModel.model.finalForm;
-    fs.express_applicationendFile("yoyo.tf", finalForm, function(err) {
+    fs.appendFile("yoyo.tf", finalForm, function(err) {
       if (err) throw err;
 
     });
@@ -410,7 +410,7 @@ express_application.post("/writeAll", function(req, res) {
     itemsToWrite.push(finalForm);
   });
   itemsToWrite.forEach(async function(item, index, array) {
-    await fs.express_applicationendFile(filename + ".tf", item, function(err) {
+    await fs.appendFile(filename + ".tf", item, function(err) {
       if (err) throw err;
       if (index === (array.length -1)) {
         // This is the last one.
@@ -418,7 +418,7 @@ express_application.post("/writeAll", function(req, res) {
           var util = require('util'),
           exec = require('child_process').exec,
           child,
-          child = exec("terraform express_applicationly -lock=false -auto-express_applicationrove",
+          child = exec("terraform apply -lock=false -auto-approve",
           function (error, stdout, stderr) {
             console.log('stdout: ' + stdout);
             console.log('stderr: ' + stderr);
@@ -576,7 +576,7 @@ express_application.get("/express_applicationly", function(req, res){
   var util = require('util'),
   exec = require('child_process').exec,
   child,
-  child = exec("terraform express_applicationly -lock=false -auto-express_applicationrove",
+  child = exec("terraform apply -lock=false -auto-approve",
   function (error, stdout, stderr) {
     console.log('stdout: ' + stdout);
     res.send({"message": stdout})

@@ -3,26 +3,26 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // server.js
-// where your node express starts
+// where your node express_application starts
 var oktatoken = process.env.OKTA_API_TOKEN
 var oktaurl = process.env.OKTA_URL
 // init project
 const express = require("express");
-const express = express();
+const express_application = express();
 var cors = require("cors");
 var hcltojson = require("hcl-to-json");
 var fs = require("fs");
 var bodyParser = require("body-parser");
 var tmp = require('tmp');
 var history = require('connect-history-api-fallback')
-express.use(history());
+express_application.use(history());
 process.on('SIGINT', function() {
   console.log( "\nGracefully shutting down from SIGINT (Ctrl-C)" );
   process.exit(1);
 });
 
 
-express.use(bodyParser.json());
+express_application.use(bodyParser.json());
 
 class Group {
   constructor(group) {
@@ -56,15 +56,15 @@ var tfGenerate = function(model, fullObject, resource, keys) {
   return body;
 };
 
-class Oauthexpress {
-  constructor(express) {
-    this.label = express.label;
-    this.type = express.settings.oauthClient.expresslication_type;
-    this.grant_types = express.settings.oauthClient.grant_types;
-    this.redirect_uris = express.settings.oauthClient.redirect_uris;
-    this.response_types = express.settings.oauthClient.response_types;
+class Oauthexpress_application {
+  constructor(express_application) {
+    this.label = express_application.label;
+    this.type = express_application.settings.oauthClient.express_applicationlication_type;
+    this.grant_types = express_application.settings.oauthClient.grant_types;
+    this.redirect_uris = express_application.settings.oauthClient.redirect_uris;
+    this.response_types = express_application.settings.oauthClient.response_types;
     this.token_endpoint_auth_method = "client_secret_basic";
-    this.finalForm = tfGenerate(this, express, "okta_express_oauth", Object.keys(this));
+    this.finalForm = tfGenerate(this, express_application, "okta_express_application_oauth", Object.keys(this));
   }
 }
 
@@ -214,8 +214,8 @@ class ModelCreator {
           case "authorizationServers":
           return new AuthorizationServer(this.modelJson);
           break;
-          case "expresss":
-          return new Oauthexpress(this.modelJson);
+          case "express_applications":
+          return new Oauthexpress_application(this.modelJson);
           break;
           case "OAUTH_AUTHORIZATION_POLICY":
           return new AuthPolicy(this.modelJson);
@@ -245,16 +245,16 @@ class ModelCreator {
 }
 
 // http://expressjs.com/en/starter/static-files.html
-express.use(express.static("public"));
-express.use(cors());
+express_application.use(express.static("public"));
+express_application.use(cors());
 
-//["groups", "authorizationServers", "expresss", "policies?type=OKTA_SIGN_ON", "policies?type=PASSWORD", "meta/schemas/user/default"]
+//["groups", "authorizationServers", "express_applications", "policies?type=OKTA_SIGN_ON", "policies?type=PASSWORD", "meta/schemas/user/default"]
 
 var refrenceModels = {
   groups:
   "https://raw.githubusercontent.com/articulate/terraform-provider-okta/master/examples/okta_group/okta_group.tf",
-  expresss:
-  "https://raw.githubusercontent.com/articulate/terraform-provider-okta/master/examples/okta_express_oauth/basic.tf",
+  express_applications:
+  "https://raw.githubusercontent.com/articulate/terraform-provider-okta/master/examples/okta_express_application_oauth/basic.tf",
   authorizationServers:
   "https://raw.githubusercontent.com/articulate/terraform-provider-okta/master/examples/okta_auth_server/basic.tf"
 };
@@ -329,11 +329,11 @@ var flattenObject = function(ob) {
 };
 
 // http://expressjs.com/en/starter/basic-routing.html
-express.get("/", function(req, res) {
+express_application.get("/", function(req, res) {
 
 });
 
-express.get("/writePolicies", function(req, res) {
+express_application.get("/writePolicies", function(req, res) {
   var request = require("request");
   var resources = req.query.resource;
   resources.forEach(function(resourceString) {
@@ -344,7 +344,7 @@ express.get("/writePolicies", function(req, res) {
       resource: oktaJson
     });
     var finalForm = fullModel.model.finalForm;
-    fs.expressendFile("yoyo.tf", finalForm, function(err) {
+    fs.express_applicationendFile("yoyo.tf", finalForm, function(err) {
       if (err) throw err;
 
     });
@@ -352,7 +352,7 @@ express.get("/writePolicies", function(req, res) {
   res.download({ type: "sources saved!" });
 });
 
-express.get("/writePoliciesTwo", function(req, res) {
+express_application.get("/writePoliciesTwo", function(req, res) {
   var request = require("request");
 
   var resource = req.query.resource;
@@ -362,7 +362,7 @@ express.get("/writePoliciesTwo", function(req, res) {
   var fullModel = new ModelCreator({ type: oktaJson.type, resource: oktaJson });
 
   var finalForm = fullModel.model.finalForm;
-  fs.expressendFile("yoyo.tf", finalForm, function(err) {
+  fs.express_applicationendFile("yoyo.tf", finalForm, function(err) {
     if (err) throw err;
 
   });
@@ -371,7 +371,7 @@ express.get("/writePoliciesTwo", function(req, res) {
 
 
 
-express.post("/writeAll", function(req, res) {
+express_application.post("/writeAll", function(req, res) {
   var autogenerate = true
   console.log(req.body.body)
   var filename = req.body.body.filename
@@ -399,7 +399,7 @@ express.post("/writeAll", function(req, res) {
     itemsToWrite.push(finalForm);
   });
   itemsToWrite.forEach(async function(item, index, array) {
-    await fs.expressendFile(filename + ".tf", item, function(err) {
+    await fs.express_applicationendFile(filename + ".tf", item, function(err) {
       if (err) throw err;
       if (index === (array.length -1)) {
         // This is the last one.
@@ -407,7 +407,7 @@ express.post("/writeAll", function(req, res) {
           var util = require('util'),
           exec = require('child_process').exec,
           child,
-          child = exec("terraform expressly -lock=false -auto-expressrove",
+          child = exec("terraform express_applicationly -lock=false -auto-express_applicationrove",
           function (error, stdout, stderr) {
             console.log('stdout: ' + stdout);
             console.log('stderr: ' + stderr);
@@ -422,7 +422,7 @@ express.post("/writeAll", function(req, res) {
   });
 });
 
-express.get("/policy", function(req, res) {
+express_application.get("/policy", function(req, res) {
   var request = require("request");
   console.log("GETS HERE")
   var href = req.query.href
@@ -433,8 +433,8 @@ express.get("/policy", function(req, res) {
     headers: {
       "Cache-Control": "no-cache",
       Authorization: "SSWS " + token,
-      "Content-Type": "expresslication/json",
-      Accept: "expresslication/json"
+      "Content-Type": "express_applicationlication/json",
+      Accept: "express_applicationlication/json"
     }
   };
   request(options, function(error, response, body) {
@@ -443,7 +443,7 @@ express.get("/policy", function(req, res) {
   });
 });
 
-express.post("/policy", function(req, res) {
+express_application.post("/policy", function(req, res) {
   var request = require("request");
   var href = req.body.href;
   var token = req.body.apiToken
@@ -453,8 +453,8 @@ express.post("/policy", function(req, res) {
     headers: {
       "Cache-Control": "no-cache",
       Authorization: "SSWS " + token,
-      "Content-Type": "expresslication/json",
-      Accept: "expresslication/json"
+      "Content-Type": "express_applicationlication/json",
+      Accept: "express_applicationlication/json"
     }
   };
   request(options, function(error, response, body) {
@@ -462,7 +462,7 @@ express.post("/policy", function(req, res) {
   });
 });
 
-express.get("/resource", function(req, res) {
+express_application.get("/resource", function(req, res) {
   var request = require("request");
   var object = req.query.resource;
   var url = req.query.url || process.env.OKTA_URL
@@ -473,8 +473,8 @@ express.get("/resource", function(req, res) {
     headers: {
       "Cache-Control": "no-cache",
       Authorization: "SSWS " + token,
-      "Content-Type": "expresslication/json",
-      Accept: "expresslication/json"
+      "Content-Type": "express_applicationlication/json",
+      Accept: "express_applicationlication/json"
     }
   };
   request(options, function(error, response, body) {
@@ -483,7 +483,7 @@ express.get("/resource", function(req, res) {
   });
 });
 
-express.post("/resource", function(req, res) {
+express_application.post("/resource", function(req, res) {
   var request = require("request");
   var object = req.body.resource
   var url = oktaurl || req.body.url
@@ -494,30 +494,30 @@ express.post("/resource", function(req, res) {
     headers: {
       "Cache-Control": "no-cache",
       Authorization: "SSWS " + token,
-      "Content-Type": "expresslication/json",
-      Accept: "expresslication/json"
+      "Content-Type": "express_applicationlication/json",
+      Accept: "express_applicationlication/json"
     }
   };
   request(options, function(error, response, body) {
     if (error) throw new Error(error);
-    var oauthexpresslications = []
+    var oauthexpress_applicationlications = []
     console.log
-    if(req.body.resource == "expresss") {
+    if(req.body.resource == "express_applications") {
       var arrayBody = JSON.parse(body)
-      arrayBody.forEach(function(express){
-        if(express.settings.oauthClient) {
-          oauthexpresslications.push(express)
+      arrayBody.forEach(function(express_application){
+        if(express_application.settings.oauthClient) {
+          oauthexpress_applicationlications.push(express_application)
         }
       })
-      console.log(oauthexpresslications)
-      res.send(oauthexpresslications)
+      console.log(oauthexpress_applicationlications)
+      res.send(oauthexpress_applicationlications)
     } else {
       res.send(body);
     }
   });
 });
 
-express.delete("/file", function(req, res){
+express_application.delete("/file", function(req, res){
   // var filename = req.query.filename
   // fs.unlink(filename + ".tf", (error) => {
   //   if (!error) {
@@ -528,7 +528,7 @@ express.delete("/file", function(req, res){
   // })
 })
 
-express.delete("/removeFile", function(req, res){
+express_application.delete("/removeFile", function(req, res){
   var filename = req.query.filename
   fs.unlink(filename, (error) => {
     if (!error) {
@@ -540,7 +540,7 @@ express.delete("/removeFile", function(req, res){
   })
 })
 
-express.get("/files", function(req, res){
+express_application.get("/files", function(req, res){
   var glob = require("glob")
   glob(__dirname + '/**/*.tf', {}, (err, files)=>{
     var filestosend = []
@@ -559,12 +559,12 @@ express.get("/files", function(req, res){
   })
 })
 
-express.get("/expressly", function(req, res){
-  console.log("gets to expressly")
+express_application.get("/express_applicationly", function(req, res){
+  console.log("gets to express_applicationly")
   var util = require('util'),
   exec = require('child_process').exec,
   child,
-  child = exec("terraform expressly -lock=false -auto-expressrove",
+  child = exec("terraform express_applicationly -lock=false -auto-express_applicationrove",
   function (error, stdout, stderr) {
     console.log('stdout: ' + stdout);
     res.send({"message": stdout})
@@ -573,9 +573,9 @@ express.get("/expressly", function(req, res){
 })
 
 // listen for requests :
-const listener = express.listen(8000, function() {
+const listener = express_application.listen(8000, function() {
   console.log(
-    "Your express is listening port " +
+    "Your express_application is listening port " +
     listener.address().port
   );
 });
