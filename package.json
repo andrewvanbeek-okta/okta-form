@@ -28,7 +28,7 @@
     "jquery": "^3.4.1",
     "js-file-download": "^0.4.8",
     "lodash.orderby": "^4.6.0",
-    "node-sass": "^4.13.0",
+    "node-sass": "^7.0.0",
     "nouislider": "14.0.2",
     "v-datatable-light": "^0.8.0",
     "v-tooltip": "2.0.2",
