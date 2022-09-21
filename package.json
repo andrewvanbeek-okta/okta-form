@@ -44,7 +44,7 @@
     "vue-simple-spinner": "^1.2.8",
     "vue-spinner": "^1.0.3",
     "vue-spinner-component": "^1.0.5",
-    "vuetify": "^2.0.14"
+    "vuetify": "^2.6.10"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "3.9.2",
