@@ -47,9 +47,9 @@
     "vuetify": "^2.0.14"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "3.9.2",
+    "@vue/cli-plugin-babel": "5.0.8",
     "@vue/cli-plugin-eslint": "3.9.2",
-    "@vue/cli-service": "3.9.3",
+    "@vue/cli-service": "5.0.8",
     "@vue/eslint-config-prettier": "4.0.1",
     "sass-loader": "7.1.0",
     "vue-template-compiler": "2.6.10"
